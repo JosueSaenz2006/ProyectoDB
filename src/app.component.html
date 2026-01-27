@@ -1,0 +1,28 @@
+<div class="min-h-screen flex flex-col">
+  <nav class="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex-shrink-0 font-bold text-xl tracking-wider text-yellow-400">
+          STREAM<span class="text-white">GUIDE</span>
+        </div>
+        <div class="flex space-x-4">
+          <a routerLink="/buscar" routerLinkActive="bg-gray-700 text-white" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">Buscar TVMaze</a>
+          <a routerLink="/catalogo" routerLinkActive="bg-gray-700 text-white" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">Catálogo Local</a>
+          <a routerLink="/watchlist" routerLinkActive="bg-gray-700 text-white" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">Watchlist</a>
+          <a routerLink="/reportes" routerLinkActive="bg-gray-700 text-white" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">Reportes</a>
+          <a routerLink="/configuracion" routerLinkActive="bg-gray-700 text-white" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition flex items-center gap-1">
+            <span class="material-icons text-sm">settings</span> Config
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-grow bg-gray-50">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="bg-gray-800 text-gray-400 py-6 text-center text-sm">
+    <p>&copy; 2024 Streaming Guide. Evaluación Técnica Angular.</p>
+  </footer>
+</div>

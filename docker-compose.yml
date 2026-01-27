@@ -1,0 +1,13 @@
+version: '3'
+services:
+  couchdb:
+    image: apache/couchdb:3
+    container_name: streaming_couchdb
+    ports:
+      - "5984:5984"
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=password
+    volumes:
+      - ./couchdb_data:/opt/couchdb/data
+    restart: always

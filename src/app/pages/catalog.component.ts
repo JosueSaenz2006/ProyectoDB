@@ -1,0 +1,180 @@
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { CatalogService } from '../../services/catalog.service';
+import { GeminiService } from '../../services/gemini.service';
+import { Content, Person, ContentPopulated } from '../../models/types';
+
+@Component({
+  selector: 'app-catalog',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="p-6 max-w-7xl mx-auto">
+      <h1 class="text-3xl font-bold mb-6 text-gray-800">Catálogo Local (CouchDB)</h1>
+
+      <!-- Tabs Toggle -->
+      <div class="flex mb-8 border-b border-gray-200">
+        <button (click)="viewMode.set('list')" 
+          class="px-6 py-3 font-medium text-sm transition-colors relative" 
+          [class.text-blue-600]="viewMode() === 'list'"
+          [class.text-gray-500]="viewMode() !== 'list'">
+          Listado
+          @if (viewMode() === 'list') { <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div> }
+        </button>
+        <button (click)="viewMode.set('create')" 
+          class="px-6 py-3 font-medium text-sm transition-colors relative"
+          [class.text-blue-600]="viewMode() === 'create'"
+          [class.text-gray-500]="viewMode() !== 'create'">
+          Nuevo Contenido
+          @if (viewMode() === 'create') { <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div> }
+        </button>
+      </div>
+
+      <!-- VISTA LISTADO -->
+      @if (viewMode() === 'list') {
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          @for (item of catalogService.contents(); track item._id) {
+            <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100 relative hover:shadow-md transition-shadow group">
+               @if ((item.rating || 0) >= 8) {
+                 <div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 text-[10px] font-extrabold px-2 py-1 rounded shadow-sm z-10">TOP</div>
+               }
+               
+               <button (click)="deleteItem(item)" class="absolute top-3 left-3 bg-red-100 text-red-600 p-1 rounded hover:bg-red-200 transition">
+                  <span class="material-icons text-sm">delete</span>
+               </button>
+
+               <div class="flex justify-between items-start mb-2 mt-4">
+                 <div class="text-xs font-bold tracking-wider text-blue-600 uppercase">{{ item.contentType }}</div>
+               </div>
+
+               <div class="relative group-hover:-translate-y-1 transition-transform duration-300">
+                 <h3 class="font-bold text-xl mb-1 text-gray-900 leading-tight">{{ item.name }}</h3>
+                 <div class="text-sm text-gray-400 mb-4 font-medium">{{ item.premiered }}</div>
+               </div>
+
+               <div class="space-y-2 mb-4">
+                 <div class="text-sm text-gray-600 flex justify-between border-b border-gray-50 pb-1">
+                   <span class="font-medium text-gray-400">Géneros</span>
+                   <span class="text-right truncate max-w-[60%]">{{ item.genres.join(', ') }}</span>
+                 </div>
+                 <div class="text-sm text-gray-600 flex justify-between border-b border-gray-50 pb-1">
+                   <span class="font-medium text-gray-400">Descargas</span>
+                   <span>{{ item.downloads | number }}</span>
+                 </div>
+                 <div class="text-sm text-gray-600 flex justify-between pt-1">
+                   <span class="font-medium text-gray-400">Protagonista</span>
+                   <span class="truncate max-w-[60%]">{{ item.actorPrincipal?.fullName || 'Desconocido' }}</span>
+                 </div>
+               </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- VISTA FORMULARIO -->
+      @if (viewMode() === 'create') {
+        <div class="bg-gray-900 p-8 rounded-2xl shadow-2xl max-w-3xl mx-auto border border-gray-800">
+          <h2 class="text-2xl font-bold mb-6 text-white flex items-center gap-2">
+            <span class="material-icons text-blue-500">add_circle</span>
+            Registrar Nuevo Contenido
+          </h2>
+          
+          <form (ngSubmit)="save()" #f="ngForm" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Tipo</label>
+                <select [(ngModel)]="newItem.contentType" name="type" class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3">
+                  <option value="MOVIE">Película</option>
+                  <option value="SERIE">Serie</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Nombre</label>
+                <input [(ngModel)]="newItem.name" name="name" required class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Estreno</label>
+                <input type="date" [(ngModel)]="newItem.premiered" name="premiered" required class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3 [color-scheme:dark]">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Descargas</label>
+                <input type="number" [(ngModel)]="newItem.downloads" name="downloads" required class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3">
+              </div>
+            </div>
+            
+             <div>
+               <label class="block text-sm font-medium text-gray-300 mb-2">Géneros (CSV)</label>
+               <input [(ngModel)]="generosInput" name="generos" class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3">
+            </div>
+
+            <!-- Selector Actor Principal -->
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Actor Principal</label>
+              <select [(ngModel)]="newItem.mainCastId" name="mainCast" required class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3">
+                @for (p of catalogService.persons(); track p._id) {
+                  <option [value]="p._id">{{ p.fullName }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex items-center gap-4 mt-8 pt-4">
+              <button type="submit" [disabled]="!f.valid" class="flex-1 bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-500 disabled:opacity-50">Guardar</button>
+              <button type="button" (click)="viewMode.set('list')" class="px-6 py-4 rounded-xl font-bold text-gray-400 hover:bg-gray-800">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      }
+    </div>
+  `
+})
+export class CatalogComponent {
+  catalogService = inject(CatalogService);
+  viewMode = signal<'list' | 'create'>('list');
+  generosInput = '';
+  
+  newItem: Content = {
+    type: 'content',
+    contentType: 'MOVIE',
+    name: '',
+    genres: [],
+    premiered: '',
+    awards: '',
+    downloads: 0,
+    rating: 0,
+    mainCastId: '',
+    castIds: []
+  };
+
+  save() {
+    // Preparar objeto
+    this.newItem.genres = this.generosInput.split(',').map(g => g.trim()).filter(g => g);
+    // Añadir principal al reparto
+    if (this.newItem.mainCastId) {
+      this.newItem.castIds = [this.newItem.mainCastId];
+    }
+    
+    this.catalogService.addContent(this.newItem).subscribe({
+      next: () => {
+        alert('Guardado en CouchDB');
+        this.catalogService.refreshData();
+        this.viewMode.set('list');
+      },
+      error: (err) => alert('Error al guardar: ' + err.message)
+    });
+  }
+
+  deleteItem(item: Content) {
+    if(!confirm(`¿Eliminar ${item.name}?`)) return;
+    if(item._id && item._rev) {
+      this.catalogService.deleteContent(item._id, item._rev).subscribe(() => {
+        this.catalogService.refreshData();
+      });
+    }
+  }
+}
