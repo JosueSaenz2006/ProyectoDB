@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { SearchComponent } from './pages/search.component';
-import { WatchlistComponent } from './pages/watchlist.component';
-import { CatalogComponent } from './pages/catalog.component';
-import { ReportsComponent } from './pages/reports.component';
-import { SettingsComponent } from './pages/settings.component';
+import { SearchComponent } from './pages/search/search.component';
+import { WatchlistComponent } from './pages/watchlist/watchlist.component';
+import { CatalogComponent } from './pages/catalog/catalog.component';
+import { ReportsComponent } from './pages/reports/reports.component';
+import { SettingsComponent } from './pages/settings/settings.component';
 
 export const routes: Routes = [
   { path: 'buscar', component: SearchComponent },
