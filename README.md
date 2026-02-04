@@ -861,14 +861,14 @@ PROYECTODB/
 
 | Miembro | Actividad | Tiempo |
 |---------|-----------|--------|
-| [Nombre 1] | Diseño modelo de datos y estructura CouchDB | 4h |
-| [Nombre 1] | Configuración CouchDB y CORS | 2h |
-| [Nombre 2] | Desarrollo servicios CouchDB y Catalog | 6h |
-| [Nombre 2] | Integración API TvMaze | 3h |
-| [Nombre 3] | Desarrollo módulo de búsqueda | 4h |
-| [Nombre 3] | Desarrollo módulo watchlist | 5h |
-| [Nombre 4] | Desarrollo módulo de reportes | 6h |
-| [Nombre 4] | Documentación y pruebas | 4h |
+| Josué Sáenz | Diseño modelo de datos y estructura CouchDB | 4h |
+| Kevin Mendez | Configuración CouchDB y CORS | 2h |
+| Josué Sáenz | Desarrollo servicios CouchDB y Catalog | 6h |
+| Edwin Angamarca | Integración API TvMaze | 3h |
+| Josué Sáenz | Desarrollo módulo de búsqueda | 4h |
+| Edwin Angamarca | Desarrollo módulo watchlist | 5h |
+| Christian Naula | Desarrollo módulo de reportes | 6h |
+| Kevin Mendez | Documentación y pruebas | 4h |
 | **Todos** | Integración y pruebas finales | 4h |
 | | **TOTAL** | **38h** |
 
