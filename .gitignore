@@ -25,3 +25,37 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ==========================================
+# CREDENCIALES - NO SUBIR A REPOSITORIO
+# ==========================================
+
+# Archivos de entorno con credenciales
+src/environments/environment.ts
+src/environments/environment.prod.ts
+src/environments/environment.development.ts
+*.env
+.env
+.env.*
+.env.local
+.env.*.local
+
+# Claves API y secretos
+**/secrets/
+**/credentials/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Configuración de CouchDB con credenciales
+couchdb.json
+couchdb-config.json
+db-config.json
+
+# Google/Firebase
+google-services.json
+GoogleService-Info.plist
+firebase-adminsdk*.json
+*-firebase-adminsdk-*.json
+service-account*.json
