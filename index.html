@@ -1,12 +1,221 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Streaming Guide</title>
+  <title>MegaBuscador TV</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<script type="importmap">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+
+  <script>
+    // Tailwind config with custom colors
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            midnight: {
+              900: '#0a0e1a',
+              800: '#0f1629',
+              700: '#1a2332',
+            },
+            gold: {
+              400: '#e5c04b',
+              500: '#d4af37',
+              600: '#b8962e',
+            },
+            sapphire: {
+              400: '#2563eb',
+              500: '#1e3a5f',
+            },
+            mint: {
+              400: '#5eead4',
+              500: '#2dd4bf',
+              600: '#14b8a6',
+            }
+          },
+          fontFamily: {
+            display: ['Sora', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      font-family: 'Inter', sans-serif;
+      box-sizing: border-box;
+    }
+
+    .font-display {
+      font-family: 'Sora', sans-serif;
+    }
+
+    /* Dark mode gradient background */
+    .gradient-midnight {
+      background: linear-gradient(135deg, #0a0e1a 0%, #0f1629 50%, #0a1628 100%);
+    }
+
+    .gradient-card {
+      background: linear-gradient(180deg, rgba(15, 22, 41, 0.9) 0%, rgba(10, 14, 26, 0.95) 100%);
+    }
+
+    .gold-glow {
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+    }
+
+    .card-hover {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(212, 175, 55, 0.1);
+    }
+
+    .btn-import {
+      background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
+      transition: all 0.3s ease;
+    }
+
+    .btn-import:hover {
+      background: linear-gradient(135deg, #e5c04b 0%, #d4af37 100%);
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+    }
+
+    .search-input {
+      background: rgba(15, 22, 41, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      border-color: rgba(212, 175, 55, 0.5);
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+      outline: none;
+    }
+
+    .nav-link {
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #d4af37, #1e3a5f);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      width: 100%;
+    }
+
+    .badge-imported {
+      background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
+    }
+
+    .badge-pending {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);
+    }
+
+    .badge-error {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    .loading-shimmer {
+      background: linear-gradient(90deg, transparent 0%, rgba(212, 175, 55, 0.1) 50%, transparent 100%);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0a0e1a;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1e3a5f;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d4af37;
+    }
+
+    /* Modal animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-backdrop {
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal-content {
+      animation: slideUp 0.3s ease-out;
+    }
+
+    /* Form inputs dark mode */
+    input,
+    select,
+    textarea {
+      color-scheme: dark;
+    }
+  </style>
+
+  <script type="importmap">
 {
   "imports": {
     "rxjs": "https://esm.sh/rxjs@^7.8.2?conditions=es2015",
@@ -27,7 +236,9 @@
 }
 </script>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans">
+
+<body class="h-full gradient-midnight text-white overflow-x-hidden">
   <app-root></app-root>
 </body>
+
 </html>

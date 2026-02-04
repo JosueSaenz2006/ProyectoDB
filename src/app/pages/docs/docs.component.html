@@ -1,0 +1,101 @@
+<!-- Documentation Page - MegaBuscador TV -->
+<div class="min-h-full">
+    <!-- Page Header -->
+    <div class="px-6 py-12 border-b border-white/5"
+        style="background: linear-gradient(180deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);">
+        <div class="max-w-7xl mx-auto">
+            <p class="text-xs tracking-[0.3em] uppercase mb-2 text-emerald-400">Referencia Técnica</p>
+            <h1 class="font-display text-3xl md:text-4xl font-light mb-4 text-white">Documentación CouchDB</h1>
+            <p class="text-gray-400">Operaciones CRUD, estructura de datos y ejemplos de código</p>
+        </div>
+    </div>
+
+    <div class="flex max-w-7xl mx-auto">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 shrink-0 border-r border-white/5 p-6 hidden md:block sticky top-0 h-screen overflow-y-auto">
+            <nav class="space-y-2">
+                @for (section of sections; track section.id) {
+                <button (click)="setSection(section.id)"
+                    class="w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all"
+                    [class.bg-emerald-500/20]="activeSection === section.id"
+                    [class.text-emerald-400]="activeSection === section.id"
+                    [class.text-gray-400]="activeSection !== section.id"
+                    [class.hover:bg-white/5]="activeSection !== section.id">
+                    {{ section.title }}
+                </button>
+                }
+            </nav>
+
+            <div class="mt-8 p-4 rounded-xl border border-white/10 bg-white/5">
+                <p class="text-xs text-gray-500 mb-2">Tecnologías</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-xs px-2 py-1 rounded bg-orange-500/20 text-orange-400">CouchDB 3.x</span>
+                    <span class="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400">Angular 19</span>
+                    <span class="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400">TypeScript</span>
+                    <span class="text-xs px-2 py-1 rounded bg-purple-500/20 text-purple-400">RxJS</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 lg:p-10">
+            @for (section of sections; track section.id) {
+            @if (activeSection === section.id) {
+            <article class="max-w-4xl">
+                <h2 class="font-display text-2xl font-light text-white mb-3">{{ section.title }}</h2>
+                <p class="text-gray-400 mb-8 leading-relaxed">{{ section.description }}</p>
+
+                <div class="space-y-8">
+                    @for (example of section.examples; track example.title) {
+                    <div class="gradient-card rounded-xl border border-white/5 overflow-hidden">
+                        <!-- Example Header -->
+                        <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium text-white">{{ example.title }}</h3>
+                                <p class="text-sm text-gray-500 mt-0.5">{{ example.description }}</p>
+                            </div>
+                            <span class="text-xs px-2 py-1 rounded font-mono"
+                                [class.bg-blue-500/20]="example.language === 'typescript'"
+                                [class.text-blue-400]="example.language === 'typescript'"
+                                [class.bg-green-500/20]="example.language === 'http'"
+                                [class.text-green-400]="example.language === 'http'"
+                                [class.bg-gray-500/20]="example.language === 'text'"
+                                [class.text-gray-400]="example.language === 'text'">
+                                {{ example.language }}
+                            </span>
+                        </div>
+                        <!-- Code Block -->
+                        <div class="p-5 overflow-x-auto">
+                            <pre
+                                class="text-sm leading-relaxed"><code [class]="'language-' + example.language">{{ example.code }}</code></pre>
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <!-- Navigation Arrows -->
+                <div class="flex justify-between mt-12 pt-8 border-t border-white/10">
+                    @if (sections.indexOf(section) > 0) {
+                    <button (click)="setSection(sections[sections.indexOf(section) - 1].id)"
+                        class="flex items-center text-gray-400 hover:text-white transition-colors">
+                        <span class="material-icons mr-2">arrow_back</span>
+                        {{ sections[sections.indexOf(section) - 1].title }}
+                    </button>
+                    } @else {
+                    <div></div>
+                    }
+
+                    @if (sections.indexOf(section) < sections.length - 1) { <button
+                        (click)="setSection(sections[sections.indexOf(section) + 1].id)"
+                        class="flex items-center text-emerald-400 hover:text-emerald-300 transition-colors">
+                        {{ sections[sections.indexOf(section) + 1].title }}
+                        <span class="material-icons ml-2">arrow_forward</span>
+                        </button>
+                        }
+                </div>
+            </article>
+            }
+            }
+        </main>
+    </div>
+</div>

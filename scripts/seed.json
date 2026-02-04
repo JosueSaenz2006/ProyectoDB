@@ -1,7 +1,7 @@
 {
   "docs": [
     {
-      "_id": "person_leo",
+      "_id": "person:leonardo_dicaprio",
       "type": "person",
       "fullName": "Leonardo DiCaprio",
       "country": "USA",
@@ -9,7 +9,7 @@
       "gender": "HOMBRE"
     },
     {
-      "_id": "person_bryan",
+      "_id": "person:bryan_cranston",
       "type": "person",
       "fullName": "Bryan Cranston",
       "country": "USA",
@@ -17,7 +17,7 @@
       "gender": "HOMBRE"
     },
     {
-      "_id": "person_aaron",
+      "_id": "person:aaron_paul",
       "type": "person",
       "fullName": "Aaron Paul",
       "country": "USA",
@@ -25,7 +25,7 @@
       "gender": "HOMBRE"
     },
     {
-      "_id": "person_kate",
+      "_id": "person:kate_winslet",
       "type": "person",
       "fullName": "Kate Winslet",
       "country": "UK",
@@ -33,7 +33,7 @@
       "gender": "MUJER"
     },
     {
-      "_id": "person_joseph",
+      "_id": "person:joseph_gordonlevitt",
       "type": "person",
       "fullName": "Joseph Gordon-Levitt",
       "country": "USA",
@@ -41,7 +41,7 @@
       "gender": "HOMBRE"
     },
     {
-      "_id": "person_ellen",
+      "_id": "person:elliot_page",
       "type": "person",
       "fullName": "Elliot Page",
       "country": "Canada",
@@ -49,7 +49,7 @@
       "gender": "HOMBRE"
     },
     {
-      "_id": "person_tom",
+      "_id": "person:tom_hardy",
       "type": "person",
       "fullName": "Tom Hardy",
       "country": "UK",
@@ -57,15 +57,15 @@
       "gender": "HOMBRE"
     },
     {
-      "_id": "person_cillian",
+      "_id": "person:cillian_murphy",
       "type": "person",
       "fullName": "Cillian Murphy",
       "country": "Ireland",
       "birthDate": "1976-05-25",
       "gender": "HOMBRE"
     },
-     {
-      "_id": "person_anna",
+    {
+      "_id": "person:anna_gunn",
       "type": "person",
       "fullName": "Anna Gunn",
       "country": "USA",
@@ -73,7 +73,7 @@
       "gender": "MUJER"
     },
     {
-      "_id": "person_bob",
+      "_id": "person:bob_odenkirk",
       "type": "person",
       "fullName": "Bob Odenkirk",
       "country": "USA",
@@ -81,70 +81,149 @@
       "gender": "HOMBRE"
     },
     {
-      "_id": "content_inception",
+      "_id": "person:emilia_clarke",
+      "type": "person",
+      "fullName": "Emilia Clarke",
+      "country": "UK",
+      "birthDate": "1986-10-23",
+      "gender": "MUJER"
+    },
+    {
+      "_id": "person:kit_harington",
+      "type": "person",
+      "fullName": "Kit Harington",
+      "country": "UK",
+      "birthDate": "1986-12-26",
+      "gender": "HOMBRE"
+    },
+    {
+      "_id": "title:inception",
       "type": "content",
       "contentType": "MOVIE",
       "name": "Inception",
       "genres": ["Ciencia Ficción", "Acción"],
       "premiered": "2010-07-16",
-      "awards": "Oscar a Mejores Efectos Visuales",
+      "awards": ["Oscar Mejores Efectos Visuales", "BAFTA Mejor Sonido"],
       "downloads": 50000,
       "rating": 8.8,
-      "mainCastId": "person_leo",
-      "castIds": ["person_leo", "person_joseph", "person_ellen", "person_tom", "person_cillian"]
+      "mainCastId": "person:leonardo_dicaprio",
+      "castIds": ["person:leonardo_dicaprio", "person:joseph_gordonlevitt", "person:elliot_page", "person:tom_hardy", "person:cillian_murphy"]
     },
     {
-      "_id": "content_breaking_bad",
+      "_id": "title:breaking_bad",
       "type": "content",
       "contentType": "SERIE",
       "name": "Breaking Bad",
       "genres": ["Crimen", "Drama"],
       "premiered": "2008-01-20",
-      "awards": "Múltiples Emmys",
+      "awards": ["Emmy Mejor Serie Dramática", "Emmy Mejor Actor", "Golden Globe"],
       "downloads": 120000,
       "rating": 9.5,
-      "mainCastId": "person_bryan",
-      "castIds": ["person_bryan", "person_aaron", "person_anna", "person_bob"],
-      "seasons": [{ "seasonNumber": 1, "episodeCount": 7 }, { "seasonNumber": 2, "episodeCount": 13 }]
+      "mainCastId": "person:bryan_cranston",
+      "castIds": ["person:bryan_cranston", "person:aaron_paul", "person:anna_gunn", "person:bob_odenkirk"],
+      "seasons": [
+        { "seasonNumber": 1, "episodeCount": 7 },
+        { "seasonNumber": 2, "episodeCount": 13 },
+        { "seasonNumber": 3, "episodeCount": 13 },
+        { "seasonNumber": 4, "episodeCount": 13 },
+        { "seasonNumber": 5, "episodeCount": 16 }
+      ]
     },
     {
-      "_id": "content_titanic",
+      "_id": "title:titanic",
       "type": "content",
       "contentType": "MOVIE",
       "name": "Titanic",
       "genres": ["Romance", "Drama"],
       "premiered": "1997-12-19",
-      "awards": "11 Oscars",
+      "awards": ["Oscar Mejor Película", "Oscar Mejor Director", "11 Oscars Total"],
       "downloads": 85000,
       "rating": 7.9,
-      "mainCastId": "person_leo",
-      "castIds": ["person_leo", "person_kate"]
+      "mainCastId": "person:leonardo_dicaprio",
+      "castIds": ["person:leonardo_dicaprio", "person:kate_winslet"]
     },
     {
-      "_id": "content_el_camino",
+      "_id": "title:el_camino",
       "type": "content",
       "contentType": "MOVIE",
       "name": "El Camino: A Breaking Bad Movie",
       "genres": ["Crimen", "Drama"],
       "premiered": "2019-10-11",
-      "awards": "Saturn Award",
+      "awards": ["Saturn Award Mejor Película TV"],
       "downloads": 40000,
       "rating": 7.3,
-      "mainCastId": "person_aaron",
-      "castIds": ["person_aaron", "person_bryan"]
+      "mainCastId": "person:aaron_paul",
+      "castIds": ["person:aaron_paul", "person:bryan_cranston"]
     },
-     {
-      "_id": "content_rev_road",
+    {
+      "_id": "title:revolutionary_road",
       "type": "content",
       "contentType": "MOVIE",
       "name": "Revolutionary Road",
       "genres": ["Drama", "Romance"],
       "premiered": "2008-12-15",
-      "awards": "Golden Globe",
+      "awards": ["Golden Globe Mejor Actriz"],
       "downloads": 15000,
       "rating": 7.3,
-      "mainCastId": "person_leo",
-      "castIds": ["person_leo", "person_kate"]
+      "mainCastId": "person:leonardo_dicaprio",
+      "castIds": ["person:leonardo_dicaprio", "person:kate_winslet"]
+    },
+    {
+      "_id": "title:game_of_thrones",
+      "type": "content",
+      "contentType": "SERIE",
+      "name": "Game of Thrones",
+      "genres": ["Fantasía", "Drama", "Aventura"],
+      "premiered": "2011-04-17",
+      "awards": ["Emmy Mejor Serie Dramática", "Golden Globe"],
+      "downloads": 200000,
+      "rating": 9.2,
+      "mainCastId": "person:emilia_clarke",
+      "castIds": ["person:emilia_clarke", "person:kit_harington"],
+      "seasons": [
+        { "seasonNumber": 1, "episodeCount": 10 },
+        { "seasonNumber": 2, "episodeCount": 10 },
+        { "seasonNumber": 3, "episodeCount": 10 },
+        { "seasonNumber": 4, "episodeCount": 10 },
+        { "seasonNumber": 5, "episodeCount": 10 },
+        { "seasonNumber": 6, "episodeCount": 10 },
+        { "seasonNumber": 7, "episodeCount": 7 },
+        { "seasonNumber": 8, "episodeCount": 6 }
+      ]
+    },
+    {
+      "_id": "title:the_dark_knight",
+      "type": "content",
+      "contentType": "MOVIE",
+      "name": "The Dark Knight",
+      "genres": ["Acción", "Crimen", "Drama"],
+      "premiered": "2008-07-18",
+      "awards": ["Oscar Mejor Actor Secundario", "Oscar Mejor Sonido"],
+      "downloads": 95000,
+      "rating": 9.0,
+      "mainCastId": "person:cillian_murphy",
+      "castIds": ["person:cillian_murphy", "person:tom_hardy"]
+    },
+    {
+      "_id": "title:better_call_saul",
+      "type": "content",
+      "contentType": "SERIE",
+      "name": "Better Call Saul",
+      "genres": ["Crimen", "Drama"],
+      "premiered": "2015-02-08",
+      "awards": ["Critics Choice", "Saturn Award"],
+      "downloads": 75000,
+      "rating": 8.9,
+      "mainCastId": "person:bob_odenkirk",
+      "castIds": ["person:bob_odenkirk", "person:anna_gunn"],
+      "seasons": [
+        { "seasonNumber": 1, "episodeCount": 10 },
+        { "seasonNumber": 2, "episodeCount": 10 },
+        { "seasonNumber": 3, "episodeCount": 10 },
+        { "seasonNumber": 4, "episodeCount": 10 },
+        { "seasonNumber": 5, "episodeCount": 10 },
+        { "seasonNumber": 6, "episodeCount": 13 }
+      ]
     }
   ]
 }

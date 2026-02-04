@@ -1,108 +1,121 @@
-
 import { Injectable, inject } from '@angular/core';
-import { CouchDbService } from './couchdb.service';
-import { Observable, map, forkJoin, switchMap } from 'rxjs';
-import { Content, Person } from '../models/types';
+import { CatalogService } from './catalog.service';
+import { Observable, of, map } from 'rxjs';
+import { ContentPopulated, Person } from '../models/types';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportsService {
-  private db = inject(CouchDbService);
-  private DESIGN_DOC = 'streaming';
+  private catalogService = inject(CatalogService);
 
-  // 1. Estrenadas en periodo (Mango Query)
-  getByDateRange(start: string, end: string): Observable<Content[]> {
-    const selector = {
-      type: 'content',
-      premiered: {
-        '$gte': start,
-        '$lte': end
-      }
-    };
-    // Ordenar por fecha (requiere índice)
-    return this.db.find<Content>(selector, [{ 'premiered': 'asc' }]).pipe(
-      map(res => res.docs)
-    );
+  // 1. Contenidos por rango de fecha de estreno
+  getByDateRange(start: string, end: string): Observable<ContentPopulated[]> {
+    const contents = this.catalogService.contents();
+    const filtered = contents.filter(c => {
+      const date = c.premiered || '';
+      return date >= start && date <= end;
+    }).sort((a, b) => (b.premiered || '').localeCompare(a.premiered || ''));
+    return of(filtered);
   }
 
-  // 2. Mayor Descarga (View: by_downloads)
-  getTopDownloads(limit: number = 10): Observable<Content[]> {
-    // descending=true para traer los mayores primero
-    return this.db.view<{ rows: { id: string }[] }>(this.DESIGN_DOC, 'by_downloads', { 
-      descending: true, 
-      limit: limit, 
-      include_docs: true 
-    }).pipe(
-      map((res: any) => res.rows.map((r: any) => r.doc))
-    );
+  // 2. Top contenidos por descargas
+  getTopDownloads(limit: number = 10): Observable<ContentPopulated[]> {
+    const contents = this.catalogService.contents();
+    const sorted = [...contents]
+      .sort((a, b) => (b.downloads || 0) - (a.downloads || 0))
+      .slice(0, limit);
+    return of(sorted);
   }
 
-  // 3. Por Actor (View: by_actor)
-  getByActor(actorId: string): Observable<Content[]> {
-    return this.db.view<{ rows: { id: string }[] }>(this.DESIGN_DOC, 'by_actor', {
-      key: actorId,
-      include_docs: true
-    }).pipe(
-      map((res: any) => res.rows.map((r: any) => r.doc))
-    );
+  // 3. Contenidos por actor
+  getByActor(actorId: string): Observable<ContentPopulated[]> {
+    const contents = this.catalogService.contents();
+    const filtered = contents.filter(c =>
+      c.mainCastId === actorId || c.castIds.includes(actorId)
+    ).sort((a, b) => (b.premiered || '').localeCompare(a.premiered || ''));
+    return of(filtered);
   }
 
-  // 4. Por Género (Mango Query o View by_genre)
-  getByGenre(genre: string): Observable<Content[]> {
-    // Usamos View para variar
-    return this.db.view<{ rows: { id: string }[] }>(this.DESIGN_DOC, 'by_genre', {
-      key: genre,
-      include_docs: true
-    }).pipe(
-      map((res: any) => res.rows.map((r: any) => r.doc))
-    );
+  // 4. Contenidos por género
+  getByGenre(genre: string): Observable<ContentPopulated[]> {
+    const contents = this.catalogService.contents();
+    const genreLower = genre.toLowerCase();
+    const filtered = contents.filter(c =>
+      c.genres.some(g => g.toLowerCase().includes(genreLower))
+    ).sort((a, b) => (b.premiered || '').localeCompare(a.premiered || ''));
+    return of(filtered);
   }
 
-  // 5. Colaboraciones (View: collaborations [MapReduce])
+  // 5. Colaboraciones entre actores
   getCollaborators(actorId: string): Observable<{ name: string, count: number }[]> {
-    // startkey = [ID, ""] 
-    // endkey = [ID, {}] (objeto vacío es el último valor posible en sort de CouchDB)
-    // group=true para que agrupe por la key exacta [A, B]
-    return this.db.view<any>(this.DESIGN_DOC, 'collaborations', {
-      startkey: [actorId, ""],
-      endkey: [actorId, {}],
-      group: true
-    }).pipe(
-      switchMap((res: any) => {
-        // res.rows = [{ key: [actorId, collabId], value: count }, ...]
-        if (res.rows.length === 0) return [[]];
+    const contents = this.catalogService.contents();
+    const persons = this.catalogService.persons();
 
-        // Necesitamos obtener los nombres de los colaboradores
-        const collabIds = res.rows.map((r: any) => r.key[1]);
-        const counts = res.rows.map((r: any) => r.value);
-
-        // Fetch de personas para resolver nombres (bulk get sería mejor, pero hacemos loop simple o listByType)
-        // Optimizamos: traer todas las personas y filtrar (ya que son pocas en el seed)
-        // En prod: usar _all_docs con keys=[...]
-        return this.db.listByType<Person>('person').pipe(
-          map(pRes => {
-            return collabIds.map((id: string, idx: number) => {
-              const person = pRes.docs.find(p => p._id === id);
-              return {
-                name: person ? person.fullName : 'Desconocido',
-                count: counts[idx]
-              };
-            });
-          })
-        );
-      })
+    // Encontrar contenidos donde participa el actor
+    const actorContents = contents.filter(c =>
+      c.mainCastId === actorId || c.castIds.includes(actorId)
     );
+
+    // Contar colaboradores
+    const collabMap = new Map<string, number>();
+    actorContents.forEach(content => {
+      const allCast = [content.mainCastId, ...content.castIds];
+      allCast.forEach(castId => {
+        if (castId !== actorId) {
+          collabMap.set(castId, (collabMap.get(castId) || 0) + 1);
+        }
+      });
+    });
+
+    // Convertir a array con nombres
+    const result = Array.from(collabMap.entries())
+      .map(([id, count]) => {
+        const person = persons.find(p => p._id === id);
+        return { name: person?.fullName || id, count };
+      })
+      .sort((a, b) => b.count - a.count);
+
+    return of(result);
   }
 
-  // Utilidad: Listar todos los géneros (usando la vista y reduce=false o parseando)
+  // Utilidad: Listar todos los géneros únicos
   getAllGenres(): Observable<string[]> {
-    return this.db.view<any>(this.DESIGN_DOC, 'by_genre', { reduce: false }).pipe(
-        map((res: any) => {
-            const genres = new Set<string>();
-            res.rows.forEach((r: any) => genres.add(r.key));
-            return Array.from(genres).sort();
-        })
-    );
+    const contents = this.catalogService.contents();
+    const genres = new Set<string>();
+    contents.forEach(c => c.genres.forEach(g => genres.add(g)));
+    return of(Array.from(genres).sort());
+  }
+
+  // Utilidad: Listar todos los actores
+  getAllActors(): Observable<Person[]> {
+    return of(this.catalogService.persons());
+  }
+
+  // Estadísticas generales
+  getStats(): Observable<{
+    totalSeries: number;
+    totalMovies: number;
+    totalActors: number;
+    totalGenres: number;
+    avgRating: number;
+  }> {
+    const contents = this.catalogService.contents();
+    const persons = this.catalogService.persons();
+    const genres = new Set<string>();
+    contents.forEach(c => c.genres.forEach(g => genres.add(g)));
+
+    const ratings = contents.filter(c => c.rating).map(c => c.rating || 0);
+    const avgRating = ratings.length > 0
+      ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+      : 0;
+
+    return of({
+      totalSeries: contents.filter(c => c.contentType === 'SERIE').length,
+      totalMovies: contents.filter(c => c.contentType === 'MOVIE').length,
+      totalActors: persons.length,
+      totalGenres: genres.size,
+      avgRating: Math.round(avgRating * 10) / 10
+    });
   }
 }

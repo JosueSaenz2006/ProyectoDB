@@ -1,1 +1,131 @@
-/* Estilos específicos del componente Search */
+/* Premium Search Component Styles - MegaBuscador TV */
+
+/* Modal animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:host {
+  display: block;
+}
+
+/* Card image overlay on hover */
+.card-hover .aspect-\[2\/3\]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(10, 14, 26, 0.9) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-hover:hover .aspect-\[2\/3\]::after {
+  opacity: 1;
+}
+
+/* Play button overlay on hover */
+.card-hover::before {
+  content: '▶';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  font-size: 2rem;
+  color: #d4af37;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.card-hover:hover::before {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Ensure card is positioned */
+.card-hover {
+  position: relative;
+}
+
+/* Modal styling */
+.fixed.inset-0 {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.fixed.inset-0 > div {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Premium button pulse effect */
+.btn-gold {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gold::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn-gold:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Search input glow animation */
+.search-input-premium {
+  animation: subtleGlow 3s ease-in-out infinite;
+}
+
+@keyframes subtleGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+  }
+}
+
+/* Scrollbar for modal */
+.max-h-\[90vh\] {
+  scrollbar-width: thin;
+  scrollbar-color: #1e3a5f #0a0e1a;
+}
+
+.max-h-\[90vh\]::-webkit-scrollbar {
+  width: 6px;
+}
+
+.max-h-\[90vh\]::-webkit-scrollbar-track {
+  background: #0a0e1a;
+}
+
+.max-h-\[90vh\]::-webkit-scrollbar-thumb {
+  background: #1e3a5f;
+  border-radius: 3px;
+}
+
+.max-h-\[90vh\]::-webkit-scrollbar-thumb:hover {
+  background: #d4af37;
+}

@@ -1,28 +1,63 @@
-<div class="min-h-screen flex flex-col">
-  <nav class="bg-gray-900 text-white shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="flex items-center justify-between h-16">
-        <div class="flex-shrink-0 font-bold text-xl tracking-wider text-yellow-400">
-          STREAM<span class="text-white">GUIDE</span>
-        </div>
-        <div class="flex space-x-4">
-          <a routerLink="/buscar" routerLinkActive="bg-gray-700 text-white" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">Buscar TVMaze</a>
-          <a routerLink="/catalogo" routerLinkActive="bg-gray-700 text-white" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">Catálogo Local</a>
-          <a routerLink="/watchlist" routerLinkActive="bg-gray-700 text-white" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">Watchlist</a>
-          <a routerLink="/reportes" routerLinkActive="bg-gray-700 text-white" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition">Reportes</a>
-          <a routerLink="/configuracion" routerLinkActive="bg-gray-700 text-white" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition flex items-center gap-1">
-            <span class="material-icons text-sm">settings</span> Config
-          </a>
-        </div>
+<div class="min-h-screen flex flex-col gradient-midnight">
+  <!-- Premium Navbar -->
+  <nav class="px-6 py-4 flex items-center justify-between border-b border-white/5 sticky top-0 z-50"
+    style="background: rgba(10, 14, 26, 0.95); backdrop-filter: blur(10px);">
+    <div class="flex items-center gap-8">
+      <!-- Logo MB -->
+      <a routerLink="/" class="flex items-center gap-3">
+        <svg width="36" height="36" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="76" height="76" rx="16" stroke="#d4af37" stroke-width="1" fill="none" />
+          <path d="M15 58V22L30 42L45 22V58" stroke="#d4af37" stroke-width="3" fill="none" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M52 22H62C67 22 71 26 71 31C71 36 67 40 62 40H52M52 40H64C69 40 73 44 73 49C73 54 69 58 64 58H52V22"
+            stroke="#d4af37" stroke-width="3" fill="none" stroke-linecap="round" />
+          <polygon points="56,36 56,44 62,40" fill="#2dd4bf" />
+        </svg>
+        <span class="font-display font-medium text-lg hidden sm:block text-white">MegaBuscador</span>
+      </a>
+      <!-- Nav Links -->
+      <div class="hidden md:flex items-center gap-6">
+        <a routerLink="/buscar" routerLinkActive="active" class="nav-link text-sm font-medium"
+          [class.text-gold-500]="isActive('/buscar')" [class.text-gray-400]="!isActive('/buscar')">Buscar</a>
+        <a routerLink="/watchlist" routerLinkActive="active" class="nav-link text-sm"
+          [class.text-gold-500]="isActive('/watchlist')" [class.text-gray-400]="!isActive('/watchlist')">Watchlist</a>
+        <a routerLink="/catalogo" routerLinkActive="active" class="nav-link text-sm"
+          [class.text-gold-500]="isActive('/catalogo')" [class.text-gray-400]="!isActive('/catalogo')">Catálogo</a>
+        <a routerLink="/reportes" routerLinkActive="active" class="nav-link text-sm"
+          [class.text-gold-500]="isActive('/reportes')" [class.text-gray-400]="!isActive('/reportes')">Reportes</a>
+        <a routerLink="/docs" routerLinkActive="active" class="nav-link text-sm"
+          [class.text-gold-500]="isActive('/docs')" [class.text-gray-400]="!isActive('/docs')">Docs</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <!-- Notification bell -->
+      <button class="p-2 rounded-lg hover:bg-white/5 transition-colors">
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+      </button>
+      <!-- Settings -->
+      <a routerLink="/configuracion" class="p-2 rounded-lg hover:bg-white/5 transition-colors">
+        <span class="material-icons text-gray-400 text-xl">settings</span>
+      </a>
+      <!-- Avatar -->
+      <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium text-white"
+        style="background: linear-gradient(135deg, #1e3a5f, #2563eb);">
+        JD
       </div>
     </div>
   </nav>
 
-  <main class="flex-grow bg-gray-50">
+  <!-- Main Content -->
+  <main class="flex-grow">
     <router-outlet></router-outlet>
   </main>
 
-  <footer class="bg-gray-800 text-gray-400 py-6 text-center text-sm">
-    <p>&copy; 2024 Streaming Guide. Evaluación Técnica Angular.</p>
+  <!-- Premium Footer -->
+  <footer class="border-t border-white/5 py-8 mt-auto" style="background: rgba(10, 14, 26, 0.95);">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+      <p class="text-xs text-gray-500">MegaBuscador TV • Powered by CouchDB • Proyecto Base de Datos NoSQL</p>
+    </div>
   </footer>
 </div>

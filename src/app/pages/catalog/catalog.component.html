@@ -1,120 +1,201 @@
-<div class="p-6 max-w-7xl mx-auto">
-  <h1 class="text-3xl font-bold mb-6 text-gray-800">Catálogo Local (CouchDB)</h1>
+<!-- Catalog Page - MegaBuscador TV Premium Design -->
+<div class="min-h-full">
+  <!-- Page Header -->
+  <div class="px-6 py-12 border-b border-white/5"
+    style="background: linear-gradient(180deg, rgba(30, 58, 95, 0.1) 0%, transparent 100%);">
+    <div class="max-w-7xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase mb-2 text-amber-500">Base de Datos Local</p>
+      <h1 class="font-display text-3xl md:text-4xl font-light mb-4 text-white">Catálogo CouchDB</h1>
+      <p class="text-gray-400 mb-8">Gestiona tu contenido importado y añade nuevas películas o series</p>
 
-  <!-- Tabs Toggle -->
-  <div class="flex mb-8 border-b border-gray-200">
-    <button (click)="viewMode.set('list')" 
-      class="px-6 py-3 font-medium text-sm transition-colors relative" 
-      [class.text-blue-600]="viewMode() === 'list'"
-      [class.text-gray-500]="viewMode() !== 'list'">
-      Listado
-      @if (viewMode() === 'list') { <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div> }
-    </button>
-    <button (click)="viewMode.set('create')" 
-      class="px-6 py-3 font-medium text-sm transition-colors relative"
-      [class.text-blue-600]="viewMode() === 'create'"
-      [class.text-gray-500]="viewMode() !== 'create'">
-      Nuevo Contenido
-      @if (viewMode() === 'create') { <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div> }
-    </button>
+      <!-- Tabs -->
+      <div class="flex gap-4">
+        <button (click)="viewMode.set('list')" class="px-6 py-3 rounded-xl font-medium text-sm transition-all"
+          [class.btn-import]="viewMode() === 'list'" [class.text-black]="viewMode() === 'list'"
+          [class.text-gray-400]="viewMode() !== 'list'" [class.bg-white/5]="viewMode() !== 'list'"
+          [class.hover:bg-white/10]="viewMode() !== 'list'">
+          <span class="flex items-center gap-2">
+            <span class="material-icons text-sm">list</span>
+            Listado
+          </span>
+        </button>
+        <button (click)="viewMode.set('create')" class="px-6 py-3 rounded-xl font-medium text-sm transition-all"
+          [class.btn-import]="viewMode() === 'create'" [class.text-black]="viewMode() === 'create'"
+          [class.text-gray-400]="viewMode() !== 'create'" [class.bg-white/5]="viewMode() !== 'create'"
+          [class.hover:bg-white/10]="viewMode() !== 'create'">
+          <span class="flex items-center gap-2">
+            <span class="material-icons text-sm">add_circle</span>
+            Nuevo Contenido
+          </span>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- VISTA LISTADO -->
-  @if (viewMode() === 'list') {
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <!-- Content Area -->
+  <div class="px-6 py-8 max-w-7xl mx-auto">
+
+    <!-- LIST VIEW -->
+    @if (viewMode() === 'list') {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       @for (item of catalogService.contents(); track item._id) {
-        <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100 relative hover:shadow-md transition-shadow group">
-           @if ((item.rating || 0) >= 8) {
-             <div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 text-[10px] font-extrabold px-2 py-1 rounded shadow-sm z-10">TOP</div>
-           }
-           
-           <button (click)="deleteItem(item)" class="absolute top-3 left-3 bg-red-100 text-red-600 p-1 rounded hover:bg-red-200 transition">
-              <span class="material-icons text-sm">delete</span>
-           </button>
-
-           <div class="flex justify-between items-start mb-2 mt-4">
-             <div class="text-xs font-bold tracking-wider text-blue-600 uppercase">{{ item.contentType }}</div>
-           </div>
-
-           <div class="relative group-hover:-translate-y-1 transition-transform duration-300">
-             <h3 class="font-bold text-xl mb-1 text-gray-900 leading-tight">{{ item.name }}</h3>
-             <div class="text-sm text-gray-400 mb-4 font-medium">{{ item.premiered }}</div>
-           </div>
-
-           <div class="space-y-2 mb-4">
-             <div class="text-sm text-gray-600 flex justify-between border-b border-gray-50 pb-1">
-               <span class="font-medium text-gray-400">Géneros</span>
-               <span class="text-right truncate max-w-[60%]">{{ item.genres.join(', ') }}</span>
-             </div>
-             <div class="text-sm text-gray-600 flex justify-between border-b border-gray-50 pb-1">
-               <span class="font-medium text-gray-400">Descargas</span>
-               <span>{{ item.downloads | number }}</span>
-             </div>
-             <div class="text-sm text-gray-600 flex justify-between pt-1">
-               <span class="font-medium text-gray-400">Protagonista</span>
-               <span class="truncate max-w-[60%]">{{ item.actorPrincipal?.fullName || 'Desconocido' }}</span>
-             </div>
-           </div>
+      <div class="gradient-card rounded-2xl border border-white/5 overflow-hidden card-hover relative group">
+        <!-- Top Badge -->
+        @if ((item.rating || 0) >= 8) {
+        <div class="absolute top-3 right-3 z-10">
+          <span class="btn-import px-3 py-1 rounded-full text-[10px] font-bold text-black">★ TOP</span>
         </div>
+        }
+
+        <!-- Content -->
+        <div class="p-6 relative">
+          <!-- Type Badge -->
+          <span class="inline-block px-3 py-1 rounded-full text-[10px] font-medium mb-4"
+            [class.badge-imported]="item.contentType === 'SERIE'" [class.text-black]="item.contentType === 'SERIE'"
+            [class.bg-blue-500/20]="item.contentType === 'MOVIE'" [class.text-blue-400]="item.contentType === 'MOVIE'">
+            {{ item.contentType }}
+          </span>
+
+          <!-- Title -->
+          <h3 class="font-display font-medium text-xl mb-2 text-white">{{ item.name }}</h3>
+          <p class="text-sm text-gray-500 mb-6">{{ item.premiered }}</p>
+
+          <!-- Info Grid -->
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between items-center py-2 border-b border-white/5">
+              <span class="text-gray-500">Géneros</span>
+              <span class="text-gray-300 text-right truncate max-w-[60%]">{{ item.genres.join(', ') || 'N/A' }}</span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-white/5">
+              <span class="text-gray-500">Descargas</span>
+              <span class="text-teal-400 font-medium">{{ item.downloads | number }}</span>
+            </div>
+            @if (item.awards && item.awards.length > 0) {
+            <div class="py-2 border-b border-white/5">
+              <span class="text-gray-500 block mb-1">Premios</span>
+              <div class="flex flex-wrap gap-1">
+                @for (award of item.awards; track award) {
+                <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400">{{ award }}</span>
+                }
+              </div>
+            </div>
+            }
+            <div class="flex justify-between items-center py-2">
+              <span class="text-gray-500">Protagonista</span>
+              <span class="text-gray-300 truncate max-w-[60%]">{{ item.actorPrincipal?.fullName || 'Desconocido'
+                }}</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="mt-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+            <button (click)="simulateDownload(item)"
+              class="flex-1 py-2 rounded-lg bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 transition-all flex items-center justify-center gap-2">
+              <span class="material-icons text-sm">download</span>
+              <span class="text-sm">+1 Descarga</span>
+            </button>
+            <button (click)="deleteItem(item)"
+              class="flex-1 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all flex items-center justify-center gap-2">
+              <span class="material-icons text-sm">delete</span>
+              <span class="text-sm">Eliminar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- Empty State -->
+      @if (catalogService.contents().length === 0) {
+      <div class="col-span-full text-center py-16">
+        <span class="material-icons text-6xl mb-4 text-gray-600">inventory_2</span>
+        <h3 class="font-display text-xl mb-2 text-white">Sin contenido</h3>
+        <p class="text-sm text-gray-500">Importa series desde la búsqueda o crea contenido nuevo</p>
+      </div>
       }
     </div>
-  }
+    }
 
-  <!-- VISTA FORMULARIO -->
-  @if (viewMode() === 'create') {
-    <div class="bg-gray-900 p-8 rounded-2xl shadow-2xl max-w-3xl mx-auto border border-gray-800">
-      <h2 class="text-2xl font-bold mb-6 text-white flex items-center gap-2">
-        <span class="material-icons text-blue-500">add_circle</span>
-        Registrar Nuevo Contenido
-      </h2>
-      
-      <form (ngSubmit)="save()" #f="ngForm" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- CREATE VIEW -->
+    @if (viewMode() === 'create') {
+    <div class="max-w-2xl mx-auto">
+      <div class="gradient-card rounded-2xl border border-white/5 p-8">
+        <h2 class="font-display text-2xl font-light mb-8 text-white flex items-center gap-3">
+          <span class="material-icons text-amber-500">add_circle</span>
+          Registrar Nuevo Contenido
+        </h2>
+
+        <form (ngSubmit)="save()" #f="ngForm" class="space-y-6">
+          <!-- Row 1 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-2">Tipo</label>
+              <select [(ngModel)]="newItem.contentType" name="type"
+                class="search-input w-full py-3 px-4 rounded-xl text-white">
+                <option value="MOVIE">Película</option>
+                <option value="SERIE">Serie</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-2">Nombre</label>
+              <input [(ngModel)]="newItem.name" name="name" required placeholder="Título del contenido"
+                class="search-input w-full py-3 px-4 rounded-xl text-white placeholder-gray-500">
+            </div>
+          </div>
+
+          <!-- Row 2 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-2">Fecha de Estreno</label>
+              <input type="date" [(ngModel)]="newItem.premiered" name="premiered" required
+                class="search-input w-full py-3 px-4 rounded-xl text-white">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-2">Descargas</label>
+              <input type="number" [(ngModel)]="newItem.downloads" name="downloads" required placeholder="0"
+                class="search-input w-full py-3 px-4 rounded-xl text-white placeholder-gray-500">
+            </div>
+          </div>
+
+          <!-- Genres -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Tipo</label>
-            <select [(ngModel)]="newItem.contentType" name="type" class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3">
-              <option value="MOVIE">Película</option>
-              <option value="SERIE">Serie</option>
+            <label class="block text-sm font-medium text-gray-400 mb-2">Géneros (separados por coma)</label>
+            <input [(ngModel)]="generosInput" name="generos" placeholder="Drama, Action, Thriller"
+              class="search-input w-full py-3 px-4 rounded-xl text-white placeholder-gray-500">
+          </div>
+
+          <!-- Awards -->
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-2">Premios (separados por coma)</label>
+            <input [(ngModel)]="awardsInput" name="awards" placeholder="Oscar, Emmy, Golden Globe"
+              class="search-input w-full py-3 px-4 rounded-xl text-white placeholder-gray-500">
+          </div>
+
+          <!-- Main Cast -->
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-2">Actor Principal</label>
+            <select [(ngModel)]="newItem.mainCastId" name="mainCast" required
+              class="search-input w-full py-3 px-4 rounded-xl text-white">
+              <option value="" disabled>Seleccionar actor...</option>
+              @for (p of catalogService.persons(); track p._id) {
+              <option [value]="p._id">{{ p.fullName }}</option>
+              }
             </select>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Nombre</label>
-            <input [(ngModel)]="newItem.name" name="name" required class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3">
-          </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Estreno</label>
-            <input type="date" [(ngModel)]="newItem.premiered" name="premiered" required class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3 [color-scheme:dark]">
+          <!-- Actions -->
+          <div class="flex items-center gap-4 pt-6 border-t border-white/5">
+            <button type="submit" [disabled]="!f.valid"
+              class="flex-1 btn-import text-black font-bold py-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">
+              Guardar en CouchDB
+            </button>
+            <button type="button" (click)="viewMode.set('list')"
+              class="px-6 py-4 rounded-xl font-medium text-gray-400 hover:bg-white/5 transition-colors">
+              Cancelar
+            </button>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Descargas</label>
-            <input type="number" [(ngModel)]="newItem.downloads" name="downloads" required class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3">
-          </div>
-        </div>
-        
-         <div>
-           <label class="block text-sm font-medium text-gray-300 mb-2">Géneros (CSV)</label>
-           <input [(ngModel)]="generosInput" name="generos" class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3">
-        </div>
-
-        <!-- Selector Actor Principal -->
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">Actor Principal</label>
-          <select [(ngModel)]="newItem.mainCastId" name="mainCast" required class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3">
-            @for (p of catalogService.persons(); track p._id) {
-              <option [value]="p._id">{{ p.fullName }}</option>
-            }
-          </select>
-        </div>
-
-        <!-- Botones -->
-        <div class="flex items-center gap-4 mt-8 pt-4">
-          <button type="submit" [disabled]="!f.valid" class="flex-1 bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-500 disabled:opacity-50">Guardar</button>
-          <button type="button" (click)="viewMode.set('list')" class="px-6 py-4 rounded-xl font-bold text-gray-400 hover:bg-gray-800">Cancelar</button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
-  }
+    }
+  </div>
 </div>

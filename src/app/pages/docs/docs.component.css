@@ -1,0 +1,47 @@
+/* Docs Component Styles */
+
+pre {
+    margin: 0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+code {
+    color: #e2e8f0;
+    display: block;
+}
+
+/* Syntax highlighting simulation */
+.language-typescript {
+    color: #93c5fd;
+}
+
+.language-http {
+    color: #86efac;
+}
+
+.language-text {
+    color: #fde68a;
+    font-size: 0.75rem;
+    line-height: 1.6;
+}
+
+/* Scrollbar for code blocks */
+pre::-webkit-scrollbar {
+    height: 6px;
+}
+
+pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+pre::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}

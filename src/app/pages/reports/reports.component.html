@@ -1,113 +1,572 @@
-<div class="p-6 max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-gray-800">Reportes CouchDB</h1>
-
-    <div class="flex flex-wrap gap-2 mb-8">
-        @for (tab of tabs; track tab.id) {
-        <button (click)="setTab(tab.id)" class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-sm"
-            [class.bg-blue-600]="activeTab() === tab.id" [class.text-white]="activeTab() === tab.id"
-            [class.bg-white]="activeTab() !== tab.id">
-            {{ tab.label }}
-        </button>
-        }
+<!-- Reports Page - MegaBuscador TV Premium Design -->
+<div class="min-h-full">
+    <!-- Page Header -->
+    <div class="px-6 py-12 border-b border-white/5"
+        style="background: linear-gradient(180deg, rgba(37, 99, 235, 0.1) 0%, transparent 100%);">
+        <div class="max-w-7xl mx-auto">
+            <p class="text-xs tracking-[0.3em] uppercase mb-2 text-blue-400">Análisis de Datos</p>
+            <h1 class="font-display text-3xl md:text-4xl font-light mb-4 text-white">Reportes CouchDB</h1>
+            <p class="text-gray-400">Consultas Mango y vistas MapReduce sobre tu base de datos</p>
+        </div>
     </div>
 
-    <div class="bg-white p-8 rounded-2xl shadow-xl min-h-[400px] border border-gray-100">
+    <!-- Tabs -->
+    <div class="px-6 py-6 border-b border-white/5 max-w-7xl mx-auto">
+        <div class="flex flex-wrap gap-2">
+            @for (tab of tabs; track tab.id) {
+            <button (click)="setTab(tab.id)" class="px-5 py-2.5 rounded-xl text-sm font-medium transition-all"
+                [class.btn-import]="activeTab() === tab.id" [class.text-black]="activeTab() === tab.id"
+                [class.text-gray-400]="activeTab() !== tab.id" [class.bg-white/5]="activeTab() !== tab.id"
+                [class.hover:bg-white/10]="activeTab() !== tab.id">
+                {{ tab.label }}
+            </button>
+            }
+        </div>
+    </div>
 
-        <!-- 1. Fechas (Mango) -->
-        @if (activeTab() === 'dates') {
-        <div class="max-w-4xl">
-            <h2 class="text-2xl font-bold mb-4">Estrenadas en un periodo (Mango Query)</h2>
-            <div class="flex gap-4 mb-4">
-                <input type="date" [(ngModel)]="dateStart" class="border p-2 rounded">
-                <input type="date" [(ngModel)]="dateEnd" class="border p-2 rounded">
-                <button (click)="runDateReport()" class="bg-blue-600 text-white px-4 rounded">Ejecutar</button>
-            </div>
+    <!-- Content Area -->
+    <div class="px-6 py-8 max-w-7xl mx-auto">
+        <div class="gradient-card rounded-2xl border border-white/5 p-8 min-h-[400px]">
 
-            <table class="w-full text-left bg-gray-50 rounded">
-                <thead>
-                    <tr>
-                        <th class="p-4">Nombre</th>
-                        <th class="p-4">Estreno</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <!-- 1. Fechas (Mango) -->
+            @if (activeTab() === 'dates') {
+            <div class="max-w-4xl">
+                <h2 class="font-display text-2xl font-light mb-2 text-white">Estrenadas en un Periodo</h2>
+                <p class="text-sm text-gray-500 mb-6">Consulta Mango Query por rango de fechas</p>
+
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <input type="date" [(ngModel)]="dateStart" class="search-input py-3 px-4 rounded-xl text-white">
+                    <input type="date" [(ngModel)]="dateEnd" class="search-input py-3 px-4 rounded-xl text-white">
+                    <button (click)="runDateReport()" class="btn-import text-black font-medium py-3 px-6 rounded-xl">
+                        Ejecutar Consulta
+                    </button>
+                </div>
+
+                <!-- Results Grid - Clickeable -->
+                @if (reportResults().length > 0) {
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     @for (item of reportResults(); track item._id) {
-                    <tr class="border-t">
-                        <td class="p-4 font-bold">{{ item.name }}</td>
-                        <td class="p-4">{{ item.premiered }}</td>
-                    </tr>
+                    <div (click)="openContentDetail(item)"
+                        class="gradient-card rounded-xl border border-white/5 p-4 cursor-pointer transition-all hover:border-amber-500/50 hover:scale-[1.02]">
+                        <div class="flex items-center gap-3">
+                            @if (item.image) {
+                            <img [src]="item.image" alt="" class="w-16 h-20 object-cover rounded-lg">
+                            } @else {
+                            <div class="w-16 h-20 rounded-lg bg-white/10 flex items-center justify-center">
+                                <span class="material-icons text-gray-500">movie</span>
+                            </div>
+                            }
+                            <div class="flex-1">
+                                <p class="font-medium text-white">{{ item.name }}</p>
+                                <p class="text-xs text-gray-400">{{ item.premiered }}</p>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 mt-1 inline-block">
+                                    {{ item.contentType }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                     }
-                </tbody>
-            </table>
-        </div>
-        }
-
-        <!-- 2. Descargas (View) -->
-        @if (activeTab() === 'downloads') {
-        <h2 class="text-2xl font-bold mb-4">Top 10 Descargas (View MapReduce)</h2>
-        <div class="space-y-3">
-            @for (item of reportResults(); track item._id; let idx = $index) {
-            <div class="flex items-center p-4 bg-gray-50 rounded border">
-                <div
-                    class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold mr-4">
-                    {{ idx + 1 }}</div>
-                <div class="flex-1 font-bold">{{ item.name }}</div>
-                <div class="text-right font-mono">{{ item.downloads | number }} dls</div>
+                </div>
+                }
             </div>
             }
-        </div>
-        }
 
-        <!-- 3. Por Actor (View) -->
-        @if (activeTab() === 'actor') {
-        <h2 class="text-2xl font-bold mb-4">Por Actor (View)</h2>
-        <select [(ngModel)]="selectedActorId" (change)="runActorReport()" class="border p-2 rounded w-full mb-4">
-            <option value="">Selecciona Actor</option>
-            @for (p of catalogService.persons(); track p._id) {
-            <option [value]="p._id">{{ p.fullName }}</option>
-            }
-        </select>
-        <div class="grid gap-2">
-            @for (item of reportResults(); track item._id) {
-            <div class="p-3 bg-gray-50 border rounded">{{ item.name }} ({{ item.contentType }})</div>
-            }
-        </div>
-        }
+            <!-- 2. Descargas (View) - Clickeable -->
+            @if (activeTab() === 'downloads') {
+            <div>
+                <h2 class="font-display text-2xl font-light mb-2 text-white">Top 10 Descargas</h2>
+                <p class="text-sm text-gray-500 mb-6">Vista MapReduce ordenada por descargas</p>
 
-        <!-- 4. Por Género (View) -->
-        @if (activeTab() === 'genre') {
-        <h2 class="text-2xl font-bold mb-4">Por Género (View)</h2>
-        <div class="flex gap-2 mb-4">
-            <input [(ngModel)]="genreQuery" placeholder="Ej: Drama" class="border p-2 rounded">
-            <button (click)="runGenreReport()" class="bg-blue-600 text-white px-4 rounded">Buscar</button>
-        </div>
-        <div class="grid gap-2">
-            @for (item of reportResults(); track item._id) {
-            <div class="p-3 bg-gray-50 border rounded">{{ item.name }}</div>
-            }
-        </div>
-        }
-
-        <!-- 5. Colaboraciones (MapReduce) -->
-        @if (activeTab() === 'collab') {
-        <h2 class="text-2xl font-bold mb-4">Colaboraciones (Complex MapReduce)</h2>
-        <p class="mb-4 text-sm text-gray-500">Muestra actores que han trabajado con el seleccionado.</p>
-        <select [(ngModel)]="selectedCollabId" (change)="runCollabReport()" class="border p-2 rounded w-full mb-4">
-            <option value="">Selecciona Actor Base</option>
-            @for (p of catalogService.persons(); track p._id) {
-            <option [value]="p._id">{{ p.fullName }}</option>
-            }
-        </select>
-
-        <div class="flex flex-wrap gap-4">
-            @for (c of collabResults(); track c.name) {
-            <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-lg text-center">
-                <div class="text-indigo-900 font-bold">{{ c.name }}</div>
-                <div class="text-xs text-indigo-500">{{ c.count }} proyectos juntos</div>
+                <div class="space-y-3">
+                    @for (item of reportResults(); track item._id; let idx = $index) {
+                    <div (click)="openContentDetail(item)"
+                        class="gradient-card rounded-xl border border-white/5 p-4 flex items-center gap-4 cursor-pointer transition-all hover:border-amber-500/50">
+                        <!-- Rank -->
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
+                            [class.btn-import]="idx < 3" [class.text-black]="idx < 3" [class.bg-white/10]="idx >= 3"
+                            [class.text-white]="idx >= 3">
+                            {{ idx + 1 }}
+                        </div>
+                        <!-- Image -->
+                        @if (item.image) {
+                        <img [src]="item.image" alt="" class="w-12 h-16 object-cover rounded-lg">
+                        }
+                        <!-- Info -->
+                        <div class="flex-1">
+                            <p class="font-medium text-white">{{ item.name }}</p>
+                            <p class="text-xs text-gray-400">{{ item.genres?.join(', ') }}</p>
+                        </div>
+                        <!-- Downloads -->
+                        <div class="text-right">
+                            <span class="font-display font-semibold text-teal-400">{{ item.downloads | number }}</span>
+                            <span class="text-xs text-gray-500 ml-1">descargas</span>
+                        </div>
+                    </div>
+                    }
+                </div>
             </div>
             }
-        </div>
-        }
 
+            <!-- 3. Por Actor (View) -->
+            @if (activeTab() === 'actor') {
+            <div>
+                <h2 class="font-display text-2xl font-light mb-2 text-white">Contenido por Actor</h2>
+                <p class="text-sm text-gray-500 mb-6">Busca películas y series por actor principal</p>
+
+                <select [(ngModel)]="selectedActorId" (change)="runActorReport()"
+                    class="search-input w-full max-w-md py-3 px-4 rounded-xl text-white mb-6">
+                    <option value="">Selecciona un Actor</option>
+                    @for (p of catalogService.persons(); track p._id) {
+                    <option [value]="p._id">{{ p.fullName }}</option>
+                    }
+                </select>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @for (item of reportResults(); track item._id) {
+                    <div (click)="openContentDetail(item)"
+                        class="gradient-card rounded-xl border border-white/5 p-4 cursor-pointer transition-all hover:border-amber-500/50 hover:scale-[1.02]">
+                        <div class="flex items-center gap-3">
+                            @if (item.image) {
+                            <img [src]="item.image" alt="" class="w-14 h-18 object-cover rounded-lg">
+                            }
+                            <div>
+                                <span class="text-xs px-2 py-1 rounded mb-2 inline-block"
+                                    [class.badge-imported]="item.contentType === 'SERIE'"
+                                    [class.text-black]="item.contentType === 'SERIE'"
+                                    [class.bg-blue-500/20]="item.contentType === 'MOVIE'"
+                                    [class.text-blue-400]="item.contentType === 'MOVIE'">
+                                    {{ item.contentType }}
+                                </span>
+                                <p class="font-medium text-white">{{ item.name }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+
+            <!-- 4. Por Género (View) - Clickeable -->
+            @if (activeTab() === 'genre') {
+            <div>
+                <h2 class="font-display text-2xl font-light mb-2 text-white">Contenido por Género</h2>
+                <p class="text-sm text-gray-500 mb-6">Filtra por género usando vistas</p>
+
+                <div class="flex gap-4 mb-6 max-w-md">
+                    <input [(ngModel)]="genreQuery" placeholder="Ej: Drama, Action, Anime..."
+                        class="search-input flex-1 py-3 px-4 rounded-xl text-white placeholder-gray-500">
+                    <button (click)="runGenreReport()" class="btn-import text-black font-medium py-3 px-6 rounded-xl">
+                        Buscar
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @for (item of reportResults(); track item._id) {
+                    <div (click)="openContentDetail(item)"
+                        class="gradient-card rounded-xl border border-white/5 p-4 cursor-pointer transition-all hover:border-amber-500/50 hover:scale-[1.02]">
+                        <div class="flex items-center gap-3">
+                            @if (item.image) {
+                            <img [src]="item.image" alt="" class="w-14 h-18 object-cover rounded-lg">
+                            } @else {
+                            <div class="w-14 h-18 rounded-lg bg-white/10 flex items-center justify-center">
+                                <span class="material-icons text-gray-500">tv</span>
+                            </div>
+                            }
+                            <div>
+                                <p class="font-medium text-white">{{ item.name }}</p>
+                                <p class="text-xs text-gray-400">{{ item.genres?.join(', ') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+
+            <!-- 5. Colaboraciones (MapReduce) - Clickeable -->
+            @if (activeTab() === 'collab') {
+            <div>
+                <h2 class="font-display text-2xl font-light mb-2 text-white">Colaboraciones entre Actores</h2>
+                <p class="text-sm text-gray-500 mb-6">MapReduce complejo para encontrar actores que han trabajado juntos
+                </p>
+
+                <select [(ngModel)]="selectedCollabId" (change)="runCollabReport()"
+                    class="search-input w-full max-w-md py-3 px-4 rounded-xl text-white mb-6">
+                    <option value="">Selecciona Actor Base</option>
+                    @for (p of catalogService.persons(); track p._id) {
+                    <option [value]="p._id">{{ p.fullName }}</option>
+                    }
+                </select>
+
+                <div class="flex flex-wrap gap-4">
+                    @for (c of collabResults(); track c.name) {
+                    <div (click)="openActorDetail(c)"
+                        class="gradient-card rounded-xl border border-white/5 p-5 text-center min-w-[150px] cursor-pointer transition-all hover:border-blue-500/50 hover:scale-105">
+                        <!-- Image or Icon -->
+                        @if (c.image || c.person?.image) {
+                        <img [src]="c.image || c.person?.image" alt=""
+                            class="w-16 h-16 mx-auto mb-3 rounded-full object-cover border-2 border-blue-500/50">
+                        } @else {
+                        <div class="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center"
+                            style="background: linear-gradient(135deg, #1e3a5f, #2563eb);">
+                            <span class="material-icons text-white text-2xl">person</span>
+                        </div>
+                        }
+                        <p class="font-medium text-white mb-1">{{ c.name }}</p>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+
+            <!-- 6. EDITAR CONTENIDO -->
+            @if (activeTab() === 'edit') {
+            <div>
+                <h2 class="font-display text-2xl font-light mb-2 text-white">Editar Contenido</h2>
+                <p class="text-sm text-gray-500 mb-6">Modifica la información de series y películas guardadas</p>
+
+                <!-- Selector de contenido -->
+                <select [(ngModel)]="selectedEditId" (change)="loadContentForEdit()"
+                    class="search-input w-full max-w-md py-3 px-4 rounded-xl text-white mb-6">
+                    <option value="">Selecciona una serie o película</option>
+                    @for (c of catalogService.contents(); track c._id) {
+                    <option [value]="c._id">{{ c.name }} ({{ c.contentType }})</option>
+                    }
+                </select>
+
+                <!-- Formulario de edición -->
+                @if (editingContent()) {
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Columna 1: Info básica -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-gray-400 mb-1 block">Nombre</label>
+                            <input type="text" [(ngModel)]="editingContent()!.name"
+                                class="search-input w-full py-3 px-4 rounded-xl text-white">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Fecha Estreno</label>
+                                <input type="date" [(ngModel)]="editingContent()!.premiered"
+                                    class="search-input w-full py-3 px-4 rounded-xl text-white">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400 mb-1 block">Rating</label>
+                                <input type="number" [(ngModel)]="editingContent()!.rating" min="0" max="10" step="0.1"
+                                    class="search-input w-full py-3 px-4 rounded-xl text-white">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-gray-400 mb-1 block">Géneros (separados por coma)</label>
+                            <input type="text" [(ngModel)]="editGenresText" placeholder="Drama, Action, Comedy..."
+                                class="search-input w-full py-3 px-4 rounded-xl text-white placeholder-gray-500">
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-gray-400 mb-1 block">Premios (separados por coma)</label>
+                            <input type="text" [(ngModel)]="editAwardsText" placeholder="Emmy, Golden Globe..."
+                                class="search-input w-full py-3 px-4 rounded-xl text-white placeholder-gray-500">
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-gray-400 mb-1 block">URL Imagen (Poster)</label>
+                            <input type="text" [(ngModel)]="editingContent()!.image" placeholder="https://..."
+                                class="search-input w-full py-3 px-4 rounded-xl text-white placeholder-gray-500">
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-gray-400 mb-1 block">URL Video (YouTube)</label>
+                            <input type="text" [(ngModel)]="editingContent()!.videoUrl"
+                                placeholder="https://youtube.com/watch?v=..."
+                                class="search-input w-full py-3 px-4 rounded-xl text-white placeholder-gray-500">
+                        </div>
+                    </div>
+
+                    <!-- Columna 2: Actores y Temporadas -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs text-gray-400 mb-1 block">Actor Principal (ID)</label>
+                            <select [(ngModel)]="editingContent()!.mainCastId"
+                                class="search-input w-full py-3 px-4 rounded-xl text-white">
+                                <option value="">Sin actor principal</option>
+                                @for (p of catalogService.persons(); track p._id) {
+                                <option [value]="p._id">{{ p.fullName }}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-gray-400 mb-1 block">Reparto (IDs separados por coma)</label>
+                            <textarea [(ngModel)]="editCastIdsText" rows="3"
+                                placeholder="person:actor1, person:actor2..."
+                                class="search-input w-full py-3 px-4 rounded-xl text-white placeholder-gray-500 resize-none"></textarea>
+                            <p class="text-xs text-gray-600 mt-1">Actores disponibles:
+                                @for (p of catalogService.persons().slice(0, 5); track p._id) {
+                                <span class="text-blue-400">{{ p._id }}</span>{{ $last ? '' : ', ' }}
+                                }
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-gray-400 mb-1 block">Descripción (Español)</label>
+                            <textarea [(ngModel)]="editingContent()!.summaryEs" rows="4"
+                                placeholder="Sinopsis de la serie..."
+                                class="search-input w-full py-3 px-4 rounded-xl text-white placeholder-gray-500 resize-none"></textarea>
+                        </div>
+
+                        <!-- Temporadas (solo para series) -->
+                        @if (editingContent()!.contentType === 'SERIE') {
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-xs text-gray-400">Temporadas</label>
+                                <button (click)="addSeason()"
+                                    class="text-xs text-amber-400 hover:text-amber-300 transition-colors">
+                                    <span class="material-icons text-xs align-middle">add</span> Agregar
+                                </button>
+                            </div>
+                            <div class="space-y-2 max-h-40 overflow-y-auto">
+                                @for (season of editingContent()!.seasons; track season.seasonNumber; let i = $index) {
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-white/5">
+                                    <span class="text-xs text-gray-400 w-16">T{{ season.seasonNumber }}</span>
+                                    <input type="number" [(ngModel)]="season.episodeCount" min="1"
+                                        class="search-input flex-1 py-2 px-3 rounded-lg text-white text-sm">
+                                    <span class="text-xs text-gray-500">eps</span>
+                                    <button (click)="removeSeason(i)" class="text-red-400 hover:text-red-300">
+                                        <span class="material-icons text-sm">delete</span>
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                        </div>
+                        }
+
+                        <!-- Info adicional -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 rounded-lg bg-white/5">
+                                <p class="text-xs text-gray-500">Tipo</p>
+                                <p class="text-amber-400 font-medium">{{ editingContent()!.contentType }}</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-white/5">
+                                <p class="text-xs text-gray-500">Descargas</p>
+                                <p class="text-teal-400 font-medium">{{ editingContent()!.downloads }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="flex items-center gap-4 mt-8 pt-6 border-t border-white/10">
+                    <button (click)="saveContentChanges()" [disabled]="isSaving()"
+                        class="btn-import text-black font-medium py-3 px-8 rounded-xl disabled:opacity-50 transition-all">
+                        @if (isSaving()) {
+                        <span
+                            class="inline-block w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></span>
+                        Guardando...
+                        } @else {
+                        <span class="material-icons text-sm align-middle mr-1">save</span>
+                        Guardar Cambios
+                        }
+                    </button>
+
+                    <button (click)="loadContentForEdit()"
+                        class="text-gray-400 hover:text-white transition-colors py-3 px-6">
+                        Descartar cambios
+                    </button>
+
+                    @if (saveMessage()) {
+                    <p class="text-sm ml-4" [class.text-green-400]="saveMessage()!.type === 'success'"
+                        [class.text-red-400]="saveMessage()!.type === 'error'">
+                        {{ saveMessage()!.text }}
+                    </p>
+                    }
+                </div>
+                }
+            </div>
+            }
+
+        </div>
     </div>
 </div>
+
+<!-- Modal de Contenido (Serie/Película) -->
+@if (selectedContent()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.9);"
+    (click)="closeContentDetail()">
+    <div class="gradient-card rounded-2xl border border-white/10 max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+        (click)="$event.stopPropagation()">
+        <!-- Header con imagen -->
+        <div class="relative">
+            @if (selectedContent()!.image) {
+            <div class="h-48 overflow-hidden rounded-t-2xl">
+                <img [src]="selectedContent()!.image" alt="" class="w-full h-full object-cover opacity-50">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] to-transparent"></div>
+            </div>
+            }
+            <button (click)="closeContentDetail()"
+                class="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <!-- Título y badges -->
+            <div class="mb-4">
+                <span class="text-xs px-2 py-1 rounded mr-2"
+                    [class.badge-imported]="selectedContent()!.contentType === 'SERIE'"
+                    [class.text-black]="selectedContent()!.contentType === 'SERIE'"
+                    [class.bg-blue-500/20]="selectedContent()!.contentType === 'MOVIE'"
+                    [class.text-blue-400]="selectedContent()!.contentType === 'MOVIE'">
+                    {{ selectedContent()!.contentType }}
+                </span>
+                <h2 class="font-display text-2xl font-light text-white mt-2">{{ selectedContent()!.name }}</h2>
+                <p class="text-gray-400 text-sm">{{ selectedContent()!.premiered }}</p>
+            </div>
+
+            <!-- Video -->
+            @if (currentVideoUrl()) {
+            <div class="mb-6">
+                <div class="rounded-xl overflow-hidden aspect-video">
+                    <iframe [src]="currentVideoUrl()" frameborder="0" class="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                </div>
+            </div>
+            }
+
+            <!-- Info Grid -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="p-4 rounded-xl bg-white/5">
+                    <p class="text-xs text-gray-500 mb-1">Géneros</p>
+                    <p class="text-white text-sm">{{ selectedContent()!.genres?.join(', ') || 'N/A' }}</p>
+                </div>
+                <div class="p-4 rounded-xl bg-white/5">
+                    <p class="text-xs text-gray-500 mb-1">Descargas</p>
+                    <p class="text-teal-400 font-semibold">{{ selectedContent()!.downloads | number }}</p>
+                </div>
+                <div class="p-4 rounded-xl bg-white/5">
+                    <p class="text-xs text-gray-500 mb-1">Rating</p>
+                    <p class="text-amber-400 font-semibold">{{ selectedContent()!.rating || 'N/A' }}/10</p>
+                </div>
+                <div class="p-4 rounded-xl bg-white/5">
+                    <p class="text-xs text-gray-500 mb-1">Premios</p>
+                    <p class="text-white text-sm">{{ selectedContent()!.awards?.join(', ') || 'Ninguno' }}</p>
+                </div>
+            </div>
+
+            <!-- Temporadas (solo series) -->
+            @if (selectedContent()!.seasons && selectedContent()!.seasons!.length > 0) {
+            <div class="mb-6">
+                <h3 class="text-sm font-medium text-amber-500 mb-3">Temporadas</h3>
+                <div class="flex flex-wrap gap-2">
+                    @for (season of selectedContent()!.seasons; track season.seasonNumber) {
+                    <div class="px-3 py-2 rounded-lg bg-white/5 text-center">
+                        <p class="text-xs text-gray-400">T{{ season.seasonNumber }}</p>
+                        <p class="text-white text-sm font-medium">{{ season.episodeCount }} eps</p>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+
+            <!-- Actor principal -->
+            @if (selectedContent()!.actorPrincipal) {
+            <div class="p-4 rounded-xl bg-white/5">
+                <p class="text-xs text-gray-500 mb-2">Actor Principal</p>
+                <div class="flex items-center gap-3">
+                    @if (selectedContent()!.actorPrincipal!.image) {
+                    <img [src]="selectedContent()!.actorPrincipal!.image" alt=""
+                        class="w-10 h-10 rounded-full object-cover">
+                    } @else {
+                    <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                        <span class="material-icons text-blue-400 text-sm">person</span>
+                    </div>
+                    }
+                    <p class="text-white">{{ selectedContent()!.actorPrincipal!.fullName }}</p>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+}
+
+<!-- Modal de Actor -->
+@if (selectedActor()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.9);"
+    (click)="closeActorDetail()">
+    <div class="gradient-card rounded-2xl border border-white/10 max-w-lg w-full max-h-[90vh] overflow-y-auto"
+        (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="relative p-6 pb-0">
+            <button (click)="closeActorDetail()"
+                class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <div class="p-6 text-center">
+            <!-- Image -->
+            @if (selectedActor()!.image || selectedActor()!.person?.image) {
+            <img [src]="selectedActor()!.image || selectedActor()!.person?.image" alt=""
+                class="w-24 h-24 mx-auto mb-4 rounded-full object-cover border-4 border-blue-500/50">
+            } @else {
+            <div class="w-24 h-24 mx-auto mb-4 rounded-full flex items-center justify-center"
+                style="background: linear-gradient(135deg, #1e3a5f, #2563eb);">
+                <span class="material-icons text-white text-4xl">person</span>
+            </div>
+            }
+
+            <!-- Name -->
+            <h2 class="font-display text-2xl font-light text-white mb-2">{{ selectedActor()!.name }}</h2>
+            <p class="text-amber-500 text-sm mb-6">{{ selectedActor()!.count }} proyectos con actor seleccionado</p>
+
+            <!-- Bio -->
+            <div class="text-left mb-6">
+                <h3 class="text-sm font-medium text-gray-400 mb-2">Biografía</h3>
+                @if (isLoadingActorBio()) {
+                <div class="flex items-center justify-center py-4">
+                    <span
+                        class="inline-block w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+                    <span class="ml-2 text-gray-400 text-sm">Generando con Gemini...</span>
+                </div>
+                } @else {
+                <p class="text-gray-300 text-sm leading-relaxed">
+                    {{ selectedActor()!.bio || 'Haz clic para generar biografía con IA' }}
+                </p>
+                }
+            </div>
+
+            <!-- Info de Person si existe -->
+            @if (selectedActor()!.person) {
+            <div class="grid grid-cols-2 gap-3 mb-6 text-left">
+                <div class="p-3 rounded-lg bg-white/5">
+                    <p class="text-xs text-gray-500">País</p>
+                    <p class="text-white text-sm">{{ selectedActor()!.person!.country || 'N/A' }}</p>
+                </div>
+                <div class="p-3 rounded-lg bg-white/5">
+                    <p class="text-xs text-gray-500">Género</p>
+                    <p class="text-white text-sm">{{ selectedActor()!.person!.gender || 'N/A' }}</p>
+                </div>
+            </div>
+            }
+
+            <!-- Agregar/Editar Imagen -->
+            <div class="mt-4 p-4 rounded-xl border border-white/10 text-left">
+                <h3 class="text-sm font-medium text-amber-500 mb-3">Agregar Foto del Actor</h3>
+                <div class="flex gap-2">
+                    <input type="text" [(ngModel)]="actorImageUrl" placeholder="URL de la imagen..."
+                        class="flex-1 px-3 py-2 rounded-lg text-sm text-white placeholder-gray-500 border border-white/10 focus:border-amber-500 focus:outline-none"
+                        style="background: rgba(15, 22, 41, 0.8);">
+                    <button (click)="saveActorImage()"
+                        class="px-4 py-2 rounded-lg text-sm font-medium bg-amber-500 text-black hover:bg-amber-400 transition-colors">
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+}

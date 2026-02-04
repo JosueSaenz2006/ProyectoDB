@@ -1,30 +1,289 @@
-<div class="p-6 max-w-7xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-gray-800">Mi Watchlist</h1>
-
-    @if (watchlistService.watchlist().length === 0) {
-    <div class="p-8 text-center bg-white rounded-lg shadow-sm">
-        <p class="text-gray-500">No sigues ninguna serie aún.</p>
+<!-- Watchlist Page - Centro de Gestión de Series -->
+<div class="min-h-full">
+    <!-- Page Header -->
+    <div class="px-6 py-12 border-b border-white/5"
+        style="background: linear-gradient(180deg, rgba(45, 212, 191, 0.1) 0%, transparent 100%);">
+        <div class="max-w-7xl mx-auto">
+            <p class="text-xs tracking-[0.3em] uppercase mb-2 text-teal-400">Tu Lista Personal</p>
+            <h1 class="font-display text-3xl md:text-4xl font-light mb-4 text-white">Mi Watchlist</h1>
+            <p class="text-gray-400">Series y películas que estás siguiendo</p>
+        </div>
     </div>
-    }
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        @for (item of watchlistService.watchlist(); track item.serie_id) {
-        <div class="bg-white p-4 rounded-lg shadow flex items-center justify-between border-l-4"
-            [class.border-l-yellow-400]="item.es_top" [class.border-l-gray-300]="!item.es_top">
+    <!-- Content Area -->
+    <div class="px-6 py-8 max-w-7xl mx-auto">
 
-            <div>
-                <h3 class="font-bold text-lg text-gray-800">{{ item.titulo_formateado }}</h3>
-                @if (item.es_top) {
-                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-bold">TOP RATED</span>
-                }
+        <!-- Empty State -->
+        @if (watchlistService.watchlist().length === 0) {
+        <div class="text-center py-20">
+            <div class="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center"
+                style="background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(20, 184, 166, 0.1));">
+                <span class="material-icons text-4xl text-teal-400">bookmark_border</span>
             </div>
+            <h3 class="font-display text-xl mb-2 text-white">Tu watchlist está vacía</h3>
+            <p class="text-sm text-gray-500 mb-6">Añade series desde la búsqueda para hacer seguimiento</p>
+            <a routerLink="/buscar"
+                class="btn-import text-black font-medium py-3 px-8 rounded-xl inline-flex items-center gap-2">
+                <span class="material-icons text-sm">search</span>
+                Explorar contenido
+            </a>
+        </div>
+        }
 
-            <button (click)="remove(item.serie_id)"
-                class="text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors" title="Dejar de seguir">
-                <span class="material-icons">delete</span>
-            </button>
-
+        <!-- Watchlist Grid - Tarjetas con Imagen -->
+        @if (watchlistService.watchlist().length > 0) {
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            @for (item of watchlistService.watchlist(); track item.serie_id) {
+            <div (click)="openDetail(item)"
+                class="card-hover gradient-card rounded-xl overflow-hidden border border-white/5 cursor-pointer group">
+                <!-- Image -->
+                <div class="aspect-[2/3] relative"
+                    [style.background]="item.es_top ? 'linear-gradient(135deg, #d4af37 0%, #0f1629 100%)' : 'linear-gradient(135deg, #1e3a5f 0%, #0f1629 100%)'">
+                    @if (item.image) {
+                    <img [src]="item.image" class="w-full h-full object-cover" [alt]="item.name">
+                    } @else {
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="material-icons text-5xl text-white/30">tv</span>
+                    </div>
+                    }
+                    <!-- Badges -->
+                    @if (item.rating && item.rating > 0) {
+                    <div class="absolute top-2 right-2">
+                        <span class="px-2 py-1 rounded text-[10px] font-medium text-white"
+                            style="background: rgba(0,0,0,0.7);">
+                            {{ item.rating }} ★
+                        </span>
+                    </div>
+                    }
+                    @if (item.es_top) {
+                    <div class="absolute top-2 left-2">
+                        <span class="badge-imported px-2 py-1 rounded text-[10px] font-bold text-black">
+                            ★ TOP
+                        </span>
+                    </div>
+                    }
+                    <!-- My Rating -->
+                    @if (item.myRating) {
+                    <div class="absolute bottom-2 left-2">
+                        <span class="px-2 py-1 rounded text-[10px] font-medium bg-teal-500 text-white">
+                            Mi nota: {{ item.myRating }}/10
+                        </span>
+                    </div>
+                    }
+                </div>
+                <!-- Content -->
+                <div class="p-3">
+                    <p class="font-display font-medium text-sm mb-1 truncate text-white">{{ item.name }}</p>
+                    <p class="text-xs text-gray-500">
+                        {{ getYear(item.premiered) }} • {{ item.genres?.[0] || 'Serie' }}
+                    </p>
+                </div>
+            </div>
+            }
         </div>
         }
     </div>
 </div>
+
+<!-- Detail Modal -->
+@if (selectedItem()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop"
+    style="background: rgba(10, 14, 26, 0.95); backdrop-filter: blur(8px);" (click)="closeDetail()">
+    <div class="gradient-card rounded-2xl border border-white/10 max-w-4xl w-full max-h-[90vh] overflow-auto modal-content relative"
+        (click)="$event.stopPropagation()">
+
+        <!-- Close button -->
+        <button (click)="closeDetail()"
+            class="absolute top-4 right-4 z-10 p-2 rounded-full hover:bg-white/10 transition-colors">
+            <span class="material-icons text-white/60 hover:text-white">close</span>
+        </button>
+
+        <!-- Modal Content -->
+        <div class="md:flex">
+            <!-- Image Section -->
+            <div class="md:w-1/3 flex-shrink-0">
+                @if (selectedItem()!.image) {
+                <img [src]="selectedItem()!.image" [alt]="selectedItem()!.name"
+                    class="w-full h-64 md:h-full object-cover rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none">
+                } @else {
+                <div class="w-full h-64 md:h-full flex items-center justify-center rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none"
+                    style="background: linear-gradient(135deg, #1e3a5f 0%, #0f1629 100%);">
+                    <span class="material-icons text-6xl text-white/30">tv</span>
+                </div>
+                }
+            </div>
+
+            <!-- Info Section -->
+            <div class="md:w-2/3 p-6 md:p-8">
+                <!-- Title -->
+                <h2 class="font-display text-2xl md:text-3xl font-light text-white mb-4 pr-10">
+                    {{ selectedItem()!.name }}
+                </h2>
+
+                <!-- Metadata Row -->
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    @if (selectedItem()!.rating) {
+                    <span class="btn-import px-3 py-1 rounded-full text-xs font-medium text-black">
+                        ★ {{ selectedItem()!.rating }}
+                    </span>
+                    }
+                    <span class="text-sm text-gray-400">{{ getYear(selectedItem()!.premiered) }}</span>
+                    @if (selectedItem()!.es_top) {
+                    <span class="px-2 py-0.5 rounded text-xs bg-amber-500/20 text-amber-400">TOP RATED</span>
+                    }
+                </div>
+
+                <!-- Genres -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    @for (genre of selectedItem()!.genres || []; track $index) {
+                    <span class="px-3 py-1 rounded-full text-xs border border-gray-600 text-gray-400">
+                        {{ genre }}
+                    </span>
+                    }
+                </div>
+
+                <!-- Video Section -->
+                <div class="mb-6">
+                    @if (currentVideoUrl()) {
+                    <div class="rounded-xl overflow-hidden shadow-2xl border border-white/10 aspect-video mb-2">
+                        <iframe [src]="currentVideoUrl()" class="w-full h-full" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <button (click)="toggleVideoInput()"
+                        class="text-xs text-amber-400 hover:text-amber-300 transition-colors">
+                        <span class="material-icons text-xs align-middle">add</span>
+                        Agregar otro video
+                    </button>
+                    } @else {
+                    <div class="rounded-xl border border-white/10 aspect-video flex items-center justify-center"
+                        style="background: linear-gradient(135deg, #1e3a5f 0%, #0f1629 100%);">
+                        <div class="text-center">
+                            <span class="material-icons text-4xl text-gray-500 mb-2">videocam_off</span>
+                            <p class="text-sm text-gray-400 mb-3">Sin video asignado</p>
+                            <button (click)="toggleVideoInput()"
+                                class="px-4 py-2 rounded-lg text-xs font-medium bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors">
+                                <span class="material-icons text-xs align-middle mr-1">add_link</span>
+                                Agregar video
+                            </button>
+                        </div>
+                    </div>
+                    }
+
+                    <!-- Lista de Videos Disponibles -->
+                    @if (selectedItem()!.videos && selectedItem()!.videos!.length > 0) {
+                    <div class="mt-3">
+                        <p class="text-xs text-gray-500 mb-2">Videos disponibles:</p>
+                        <div class="flex flex-wrap gap-2">
+                            @for (video of selectedItem()!.videos; track video.id) {
+                            <div class="flex items-center gap-1 px-3 py-1.5 rounded-lg border transition-all"
+                                [class.bg-amber-500/20]="selectedItem()!.videoId === video.id"
+                                [class.border-amber-500]="selectedItem()!.videoId === video.id"
+                                [class.bg-white/5]="selectedItem()!.videoId !== video.id"
+                                [class.border-white/10]="selectedItem()!.videoId !== video.id">
+                                <button (click)="selectVideo(video.id)" class="text-xs font-medium"
+                                    [class.text-amber-400]="selectedItem()!.videoId === video.id"
+                                    [class.text-gray-400]="selectedItem()!.videoId !== video.id">
+                                    <span class="material-icons text-xs align-middle mr-1">play_circle</span>
+                                    {{ video.title || 'Video' }}
+                                </button>
+                                <button (click)="removeVideoFromList(video.id)"
+                                    class="text-red-400 hover:text-red-300 ml-1">
+                                    <span class="material-icons text-xs">close</span>
+                                </button>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
+
+                    <!-- Video Input - Agregar nuevo video -->
+                    @if (showVideoInput()) {
+                    <div class="mt-3 p-4 rounded-lg border border-white/10" style="background: rgba(30, 58, 95, 0.3);">
+                        <p class="text-xs text-gray-400 mb-2">Agregar nuevo video:</p>
+                        <input type="text" [(ngModel)]="newVideoTitle" placeholder="Título del video (opcional)"
+                            class="w-full mb-2 px-3 py-2 rounded-lg text-sm text-white placeholder-gray-500 border border-white/10 focus:border-amber-500 focus:outline-none"
+                            style="background: rgba(15, 22, 41, 0.8);">
+                        <div class="flex gap-2">
+                            <input type="text" [(ngModel)]="manualVideoUrl"
+                                placeholder="https://www.youtube.com/watch?v=..."
+                                class="flex-1 px-3 py-2 rounded-lg text-sm text-white placeholder-gray-500 border border-white/10 focus:border-amber-500 focus:outline-none"
+                                style="background: rgba(15, 22, 41, 0.8);">
+                            <button (click)="addVideoToList()" [disabled]="isValidatingVideo()"
+                                class="px-4 py-2 rounded-lg text-sm font-medium bg-amber-500 text-black hover:bg-amber-400 disabled:opacity-50 transition-colors">
+                                @if (isValidatingVideo()) {
+                                <span
+                                    class="inline-block w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
+                                } @else {
+                                Agregar
+                                }
+                            </button>
+                            <button (click)="toggleVideoInput()"
+                                class="px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-white/10">
+                                Cancelar
+                            </button>
+                        </div>
+                        @if (videoError()) {
+                        <p class="text-xs text-red-400 mt-2">{{ videoError() }}</p>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <!-- Synopsis -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium mb-2 text-amber-500">Sinopsis</h3>
+                    <p class="text-sm leading-relaxed text-gray-400">
+                        {{ selectedItem()!.summaryEs || 'Sin descripción disponible.' }}
+                    </p>
+                </div>
+
+                <!-- My Rating -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium mb-3 text-amber-500">Mi Calificación</h3>
+                    <div class="flex gap-1">
+                        @for (star of stars; track star) {
+                        <button (click)="saveRating(star)"
+                            class="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            [class.bg-amber-500]="selectedItem()!.myRating && star <= selectedItem()!.myRating!"
+                            [class.text-black]="selectedItem()!.myRating && star <= selectedItem()!.myRating!"
+                            [class.bg-white/10]="!selectedItem()!.myRating || star > selectedItem()!.myRating!"
+                            [class.text-gray-500]="!selectedItem()!.myRating || star > selectedItem()!.myRating!">
+                            <span class="text-sm font-medium">{{ star }}</span>
+                        </button>
+                        }
+                    </div>
+                    @if (selectedItem()!.myRating) {
+                    <p class="text-xs text-teal-400 mt-2">Has calificado esta serie con {{ selectedItem()!.myRating
+                        }}/10</p>
+                    }
+                </div>
+
+                <!-- My Review -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium mb-2 text-amber-500">Mi Reseña</h3>
+                    <textarea [(ngModel)]="tempReview" (blur)="saveReview()"
+                        placeholder="Escribe tu opinión sobre esta serie..." rows="3"
+                        class="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-gray-500 border border-white/10 focus:border-amber-500 focus:outline-none resize-none"
+                        style="background: rgba(15, 22, 41, 0.8);"></textarea>
+                    @if (isSavingReview()) {
+                    <p class="text-xs text-teal-400 mt-1">
+                        <span class="material-icons text-xs align-middle">check</span>
+                        Guardado
+                    </p>
+                    }
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-wrap gap-3">
+                    <button (click)="remove(selectedItem()!.serie_id)"
+                        class="py-3 px-6 rounded-xl font-medium border-2 border-red-500/50 text-red-400 transition-all hover:bg-red-500/10 flex items-center gap-2">
+                        <span class="material-icons text-sm">delete</span>
+                        Eliminar de Watchlist
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+}
